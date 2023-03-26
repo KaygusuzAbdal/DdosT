@@ -1,10 +1,15 @@
+import sys
 from random import randint
 from os import system
 import os
 import subprocess
+import readchar
 from scapy.layers.inet import TCP, IP
 from scapy.packet import Raw
 from scapy.sendrecv import send
+import signal
+
+terminal_cursor = "\033[4;37mDdosT\033[0m | $ "
 
 
 class DdosT:
@@ -28,7 +33,8 @@ class DdosT:
         print("")
         print("\033[1;37m\tMustafa Cuneyt Kafes\n".center(int(os.get_terminal_size()[0])))
         print(
-            "\033[1;32mIf you want to get more information about the program:\n"
+            "\033[1;37m[!] Use the \033[1;32m'help'\033[1;37m command to learn how to use it.\n"
+            "\n\033[1;32mIf you want to get more information about the program:\n"
             "\033[1;37mYou can contact me via Discord: Livcon#9961\n")
         print("\033[0m")
 
@@ -40,36 +46,57 @@ class DdosT:
             self.p_size = None
             self.__choose_attack()
 
+        @staticmethod
+        def __get_help(self):
+            print("\nAfter the program is opened, you need to enter which denial of service attack type you want to "
+                  "choose. Then, you can check the attack parameters with using 'options' command. If you want to "
+                  "change one of them just use 'set {option} {new_value}' command")
+            info = {1: ["options", "Check the attack's info", ""],
+                    2: ["set", "Change one of the option parameters", "'set {option} {new_value}'"],
+                    3: ["types", "Change the attack type of DDoS", ""],
+                    4: ["execute", "Start the attack", ""],
+                    5: ["help", "Shows help documentation", ""],
+                    6: ["exit", "Close the program", ""]}
+
+            # Print the names of the columns.
+            print("\n\033[1;37m{:<15} {:<38} {:<15}\n\033[0m".format('COMMAND', 'DESC', 'PARAMS'))
+
+            # print each data item.
+            for key, value in info.items():
+                attr, desc, params = value
+                print("{:<15} {:<38} {:<15}".format(attr, desc, params))
+            print("")
+
         def __choose_attack(self):
             while True:
                 print("\033[1;37mAttack Types:\n\033[0m"
                       "[1] - SynFlood\n")
                 print("Please choose your DDoS Attack type")
-                user_choice = input("DdosT | $ ")
-                try:
-                    user_choice = int(user_choice)
-                except Exception:
-                    print("\033[1;31mPlease enter a valid value\033[0m\n")
-                    continue
-                if user_choice == 1:
-                    print("\033[1;32mAttack type selected as SynFlood\033[0m\n")
-                    terminal_result = self.__terminal()
-                    if not terminal_result:
+                user_choice = input(terminal_cursor)
+                if not user_choice.lower() == "help":
+                    try:
+                        user_choice = int(user_choice)
+                    except Exception:
+                        print("\033[1;31mPlease enter a valid value\033[0m\n")
                         continue
-                    attack_result = self.syn_flood(self.count, self.p_size)
-                    if not attack_result:
-                        return
+                    if user_choice == 1:
+                        print("\033[1;32mAttack type selected as SynFlood\033[0m\n")
+                        terminal_result = self.__terminal()
+                        if not terminal_result:
+                            continue
+                        attack_result = self.syn_flood(self.count, self.p_size)
+                        if not attack_result:
+                            return
+                        else:
+                            continue
                     else:
-                        continue
+                        print("\033[1;31mPlease enter a valid value\033[0m\n")
                 else:
-                    print("\033[1;31mPlease enter a valid value\033[0m\n")
+                    self.__get_help(self)
 
         def __terminal(self):
-            def get_help():
-                print("asd")
-
             while True:
-                command = input("DdosT | $ ")
+                command = input(terminal_cursor)
                 if command == "options":
                     info = {1: ["RHOST", str(self.RHOST), "Target IP Address"],
                             2: ["RPORT", str(self.RPORT), "Target Port Number"],
@@ -85,7 +112,7 @@ class DdosT:
                         print("{:<15} {:<15} {:<15}".format(attr, val, desc))
                     print("")
                 elif command == "help":
-                    get_help()
+                    self.__get_help(self)
                 elif command == "execute":
                     return True
                 elif command == "types":
@@ -125,9 +152,9 @@ class DdosT:
                         except Exception:
                             print("\033[1;31mPlease enter a valid value\033[0m\n")
                     else:
-                        get_help()
+                        print("\n\033[1;37m[!] Use the \033[1;32m'help'\033[1;37m command to learn how to use it.\n\033[0m")
                 else:
-                    get_help()
+                    print("\n\033[1;37m[!] Use the \033[1;32m'help'\033[1;37m command to learn how to use it.\n\033[0m")
 
         def set_target_info(self, target_ip, target_port):
             self.RHOST = target_ip
@@ -172,5 +199,21 @@ class DdosT:
                 else:
                     continue
 
+
+def handler(signum, frame):
+    msg = "\n\033[1;31mCTRL+C was pressed.\033[0m Do you really want to exit ? (y/n) "
+    print(msg, end="", flush=True)
+    res = readchar.readchar()
+    if res == 'y':
+        print("")
+        exit(1)
+    else:
+        print("", end="\r", flush=True)
+        print(" " * (len(msg)+10), end="", flush=True) # clear the printed line
+        print("    ", end="\r", flush=True)
+        sys.stdout.write('\r' + terminal_cursor)
+
+
+signal.signal(signal.SIGINT, handler)
 
 ddos = DdosT()

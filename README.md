@@ -30,3 +30,7 @@ python3 DdosT.py
 
 
 It's written for educational purposes only. If you interested with Cyber Security, you can check and use the codes to learn how to do DDoS attack with python.
+
+## Video:
+
+[![tool usage video](https://img.youtube.com/vi/qJ4Cem45P4M/0.jpg)](https://www.youtube.com/watch?v=qJ4Cem45P4M)

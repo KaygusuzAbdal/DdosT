@@ -1,6 +1,6 @@
 # DdosT
 
-Written for the SYN-Flood attack which is type of denial of service. It sends SYN request packets to host and condenses the server's traffic
+Created to do load test with using the SYN-Flood attack which is type of denial of service. It sends SYN request packets to host and condenses the server's traffic.
 
 
 ## Usage:
